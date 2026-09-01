@@ -3,8 +3,6 @@ package br.com.plataformaavaliacoes.backend.domain.model;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,7 +13,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,16 +22,18 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "questoes")
-public class Questao {
+@Table(name = "blocos_questoes")
+public class BlocoQuestao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bloco_questao_id")
-    private BlocoQuestao blocoQuestao;
+    @Column(name = "texto_base", columnDefinition = "TEXT")
+    private String textoBase;
+
+    @Column(name = "anexo_url")
+    private String anexoUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "disciplina_id", nullable = false)
@@ -48,28 +47,11 @@ public class Questao {
     @JoinColumn(name = "assunto_id")
     private Assunto assunto;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String enunciado;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 50)
-    private TipoQuestao tipo = TipoQuestao.OBJETIVA;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 50)
-    private Dificuldade dificuldade = Dificuldade.MEDIA;
-
-    @Column(name = "valor_padrao", precision = 5, scale = 2)
-    private BigDecimal valorPadrao;
-
-    @Column(columnDefinition = "TEXT")
-    private String explicacao;
-
     @Column(nullable = false)
     private boolean ativo = true;
 
-    @OneToMany(mappedBy = "questao", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Alternativa> alternativas = new ArrayList<>();
+    @OneToMany(mappedBy = "blocoQuestao", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<Questao> questoes = new ArrayList<>();
 
     @Column(nullable = false, updatable = false)
     private OffsetDateTime createdAt;
@@ -87,20 +69,5 @@ public class Questao {
     @PreUpdate
     void preUpdate() {
         updatedAt = OffsetDateTime.now();
-    }
-
-    public void setAlternativas(List<Alternativa> alternativas) {
-        this.alternativas.clear();
-        if (alternativas != null) {
-            this.alternativas.addAll(alternativas);
-            for (Alternativa alt : this.alternativas) {
-                alt.setQuestao(this);
-            }
-        }
-    }
-
-    public void addAlternativa(Alternativa alternativa) {
-        alternativas.add(alternativa);
-        alternativa.setQuestao(this);
     }
 }
