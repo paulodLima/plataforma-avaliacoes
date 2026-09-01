@@ -2,9 +2,15 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
-
 import { DisciplinaService } from '../../core/services/disciplina.service';
 import { Disciplina } from '../../shared/models/disciplina.model';
+import { QuestaoService } from '../../core/services/questao.service';
+import { SerieService } from '../../core/services/serie.service';
+import { AssuntoService } from '../../core/services/assunto.service';
+import { QuestaoResponseDTO, Dificuldade, TipoQuestao, Page } from '../../shared/models/questao.model';
+import { Serie } from '../../shared/models/serie.model';
+import { Assunto } from '../../shared/models/assunto.model';
+import { FormArray, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-banco-questoes-page',
@@ -25,12 +31,31 @@ import { Disciplina } from '../../shared/models/disciplina.model';
         </div>
       </header>
 
-      <div class="filter-row" aria-label="Filtros iniciais">
-        <button type="button">Portugues</button>
-        <button type="button">8o ano</button>
-        <button type="button">Blocos</button>
-        <button type="button">Habilidade BNCC</button>
-        <button type="button">Dificuldade media</button>
+      <div class="filter-row" aria-label="Filtros iniciais" [formGroup]="filtrosForm">
+        <select formControlName="disciplinaId">
+          <option [ngValue]="null">Todas as Disciplinas</option>
+          @for (disciplina of disciplinas; track disciplina.id) {
+            <option [ngValue]="disciplina.id">{{ disciplina.nome }}</option>
+          }
+        </select>
+        <select formControlName="serieId">
+          <option [ngValue]="null">Todas as Series</option>
+          @for (serie of series; track serie.id) {
+            <option [ngValue]="serie.id">{{ serie.nome }}</option>
+          }
+        </select>
+        <select formControlName="assuntoId">
+          <option [ngValue]="null">Todos os Assuntos</option>
+          @for (assunto of assuntos; track assunto.id) {
+            <option [ngValue]="assunto.id">{{ assunto.nome }}</option>
+          }
+        </select>
+        <select formControlName="dificuldade">
+          <option [ngValue]="null">Todas as Dificuldades</option>
+          <option value="FACIL">Facil</option>
+          <option value="MEDIA">Media</option>
+          <option value="DIFICIL">Dificil</option>
+        </select>
       </div>
 
       @if (mensagemErro || mensagemSucesso) {
@@ -43,43 +68,41 @@ import { Disciplina } from '../../shared/models/disciplina.model';
         <section class="question-list panel">
           <div class="panel-heading">
             <div>
-              <span>Cadastro base</span>
-              <h2>Disciplinas</h2>
+              <span>Listagem</span>
+              <h2>Questoes</h2>
             </div>
-            <button type="button" class="icon-button" (click)="carregarDisciplinas()" [disabled]="carregando" title="Atualizar">
+            <button type="button" class="icon-button" (click)="carregarQuestoes()" [disabled]="carregando" title="Atualizar">
               AT
             </button>
           </div>
 
           @if (carregando) {
-            <div class="state">Carregando disciplinas...</div>
-          } @else if (!disciplinas.length) {
-            <div class="state">Nenhuma disciplina cadastrada ainda.</div>
+            <div class="state">Carregando questoes...</div>
+          } @else if (!questoes.length) {
+            <div class="state">Nenhuma questao encontrada.</div>
           } @else {
-            <div class="disciplinas-list">
-              @for (disciplina of disciplinas; track disciplina.id) {
+            <div class="questoes-list">
+              @for (questao of questoes; track questao.id) {
                 <article
-                  class="disciplina-row"
-                  [class.selected]="disciplinaSelecionada?.id === disciplina.id"
-                  [class.inactive]="!disciplina.ativo"
+                  class="questao-row"
+                  [class.selected]="questaoSelecionada?.id === questao.id"
                 >
-                  <button type="button" class="row-main" (click)="editar(disciplina)">
-                    <span class="row-badge">{{ disciplina.nome.slice(0, 2).toUpperCase() }}</span>
+                  <button type="button" class="row-main" (click)="editar(questao)">
+                    <span class="row-badge">{{ questao.tipo.slice(0, 3).toUpperCase() }}</span>
                     <span>
-                      <strong>{{ disciplina.nome }}</strong>
-                      <small>{{ disciplina.ativo ? 'Ativa no banco' : 'Inativa' }}</small>
+                      <strong>{{ questao.enunciado.substring(0, 50) }}{{ questao.enunciado.length > 50 ? '...' : '' }}</strong>
+                      <small>Dificuldade: {{ questao.dificuldade }} | Alternativas: {{ questao.alternativas?.length || 0 }}</small>
                     </span>
                   </button>
 
                   <div class="row-actions">
-                    <button type="button" class="text-button" (click)="editar(disciplina)">Editar</button>
+                    <button type="button" class="text-button" (click)="editar(questao)">Editar</button>
                     <button
                       type="button"
                       class="danger-button"
-                      [disabled]="!disciplina.ativo"
-                      (click)="inativar(disciplina)"
+                      (click)="excluir(questao)"
                     >
-                      Inativar
+                      Excluir
                     </button>
                   </div>
                 </article>
@@ -91,48 +114,129 @@ import { Disciplina } from '../../shared/models/disciplina.model';
         <section class="detail-panel panel">
           <div class="panel-heading">
             <div>
-              <span>{{ disciplinaSelecionada ? 'Edicao' : 'Novo cadastro' }}</span>
-              <h2>{{ disciplinaSelecionada ? 'Editar disciplina' : 'Nova disciplina' }}</h2>
+              <span>{{ questaoSelecionada ? 'Edicao' : 'Novo cadastro' }}</span>
+              <h2>{{ questaoSelecionada ? 'Editar questao' : 'Nova questao' }}</h2>
             </div>
-            <strong class="counter">{{ disciplinas.length }}</strong>
           </div>
 
           <form [formGroup]="form" (ngSubmit)="salvar()">
-            <label for="nome">Nome da disciplina</label>
-            <input id="nome" type="text" formControlName="nome" placeholder="Ex: Portugues" />
+            <label for="disciplinaId">Disciplina</label>
+            <select id="disciplinaId" formControlName="disciplinaId">
+               <option [ngValue]="null">Selecione uma disciplina</option>
+               @for (disciplina of disciplinas; track disciplina.id) {
+                  <option [ngValue]="disciplina.id">{{ disciplina.nome }}</option>
+               }
+            </select>
 
-            @if (form.controls.nome.invalid && form.controls.nome.touched) {
-              <small class="field-error">Informe o nome da disciplina com ate 120 caracteres.</small>
-            }
+            <label for="serieId">Serie</label>
+            <select id="serieId" formControlName="serieId">
+               <option [ngValue]="null">Selecione uma serie</option>
+               @for (serie of series; track serie.id) {
+                  <option [ngValue]="serie.id">{{ serie.nome }}</option>
+               }
+            </select>
 
-            @if (disciplinaSelecionada) {
-              <label class="checkbox">
-                <input type="checkbox" formControlName="ativo" />
-                Disciplina ativa
-              </label>
-            }
+            <label for="assuntoId">Assunto (Opcional)</label>
+            <select id="assuntoId" formControlName="assuntoId">
+               <option [ngValue]="null">Selecione um assunto</option>
+               @for (assunto of assuntos; track assunto.id) {
+                  <option [ngValue]="assunto.id">{{ assunto.nome }}</option>
+               }
+            </select>
+
+            <label for="enunciado">Enunciado</label>
+            <textarea id="enunciado" formControlName="enunciado" rows="3"></textarea>
+
+            <label for="tipo">Tipo da Questao</label>
+            <select id="tipo" formControlName="tipo">
+              <option value="OBJETIVA">Objetiva</option>
+              <option value="VERDADEIRO_FALSO">Verdadeiro ou Falso</option>
+              <option value="DISCURSIVA">Discursiva</option>
+            </select>
+
+            <label for="dificuldade">Dificuldade</label>
+            <select id="dificuldade" formControlName="dificuldade">
+              <option value="FACIL">Facil</option>
+              <option value="MEDIA">Media</option>
+              <option value="DIFICIL">Dificil</option>
+            </select>
+
+            <div class="alternativas-section">
+              <div class="alternativas-header">
+                <label>Alternativas</label>
+                <button type="button" class="text-button" (click)="adicionarAlternativa()">+ Adicionar</button>
+              </div>
+
+              <div formArrayName="alternativas" class="alternativas-list">
+                @for (altCtrl of alternativasFormArray.controls; track $index) {
+                  <div [formGroupName]="$index" class="alternativa-item">
+                    <input type="checkbox" formControlName="correta" title="Correta" />
+                    <input type="text" formControlName="texto" placeholder="Texto da alternativa" />
+                    <button type="button" class="danger-button" (click)="removerAlternativa($index)">X</button>
+                  </div>
+                }
+              </div>
+              @if (alternativasFormArray.length < 2) {
+                 <small class="field-error">Adicione pelo menos 2 alternativas.</small>
+              }
+            </div>
 
             <div class="form-actions">
-              @if (disciplinaSelecionada) {
+              @if (questaoSelecionada) {
                 <button type="button" class="ghost-button" (click)="cancelarEdicao()">Cancelar</button>
               }
               <button type="submit" class="primary-button" [disabled]="salvando">
-                {{ salvando ? 'Salvando...' : 'Salvar disciplina' }}
+                {{ salvando ? 'Salvando...' : 'Salvar questao' }}
               </button>
             </div>
           </form>
 
-          <div class="quality-card">
-            <span>Qualidade do banco</span>
-            <strong>Estrutura inicial</strong>
-            <p>Disciplinas sao o primeiro eixo para organizar series, assuntos, blocos e provas.</p>
-          </div>
         </section>
       </div>
     </section>
   `,
   styles: [`
     .banco-page { gap: 18px; }
+    textarea, select {
+      width: 100%;
+      min-height: 42px;
+      padding: 8px 14px;
+      border: 1px solid var(--pa-border-strong);
+      border-radius: var(--pa-radius-sm);
+      color: var(--pa-ink);
+      background: var(--pa-panel-soft);
+      font-family: inherit;
+    }
+    textarea:focus, select:focus {
+      border-color: var(--pa-accent);
+      outline: 3px solid rgba(79, 163, 138, 0.16);
+    }
+    .alternativas-section {
+       display: flex;
+       flex-direction: column;
+       gap: 10px;
+       margin-top: 10px;
+       padding-top: 10px;
+       border-top: 1px solid var(--pa-border);
+    }
+    .alternativas-header {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+    }
+    .alternativas-list {
+       display: flex;
+       flex-direction: column;
+       gap: 8px;
+    }
+    .alternativa-item {
+       display: flex;
+       align-items: center;
+       gap: 10px;
+    }
+    .alternativa-item input[type="text"] {
+       flex-grow: 1;
+    }
     .eyebrow, .panel-heading span, .quality-card span {
       letter-spacing: 0.04em;
     }
@@ -204,8 +308,8 @@ import { Disciplina } from '../../shared/models/disciplina.model';
       color: var(--pa-muted);
       background: var(--pa-panel-soft);
     }
-    .disciplinas-list { display: grid; gap: 10px; }
-    .disciplina-row {
+    .questoes-list { display: grid; gap: 10px; }
+    .questao-row {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 12px;
@@ -215,11 +319,11 @@ import { Disciplina } from '../../shared/models/disciplina.model';
       border-radius: var(--pa-radius-sm);
       background: var(--pa-panel-soft);
     }
-    .disciplina-row.selected {
+    .questao-row.selected {
       border-color: rgba(79, 163, 138, 0.55);
       background: var(--pa-accent-soft);
     }
-    .disciplina-row.inactive { opacity: 0.66; }
+    .questao-row.inactive { opacity: 0.66; }
     .row-main {
       display: flex;
       align-items: center;
@@ -325,7 +429,7 @@ import { Disciplina } from '../../shared/models/disciplina.model';
     }
 
     @media (max-width: 640px) {
-      .disciplina-row { grid-template-columns: 1fr; }
+      .questao-row { grid-template-columns: 1fr; }
       .row-actions { justify-content: flex-start; flex-wrap: wrap; }
       .form-actions { flex-direction: column-reverse; }
       .form-actions button { width: 100%; }
@@ -335,36 +439,103 @@ import { Disciplina } from '../../shared/models/disciplina.model';
 export class BancoQuestoesPageComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
 
+  questoes: QuestaoResponseDTO[] = [];
+  questaoSelecionada?: QuestaoResponseDTO;
+
   disciplinas: Disciplina[] = [];
-  disciplinaSelecionada?: Disciplina;
+  series: Serie[] = [];
+  assuntos: Assunto[] = [];
+
   carregando = false;
   salvando = false;
   mensagemErro = '';
   mensagemSucesso = '';
 
-  form = this.formBuilder.nonNullable.group({
-    nome: ['', [Validators.required, Validators.maxLength(120)]],
-    ativo: [true]
+  filtrosForm = this.formBuilder.group({
+    disciplinaId: [null as number | null],
+    serieId: [null as number | null],
+    assuntoId: [null as number | null],
+    dificuldade: [null as Dificuldade | null]
   });
 
-  constructor(private readonly disciplinaService: DisciplinaService) {}
+  form = this.formBuilder.group({
+    disciplinaId: [null as number | null, Validators.required],
+    serieId: [null as number | null, Validators.required],
+    assuntoId: [null as number | null],
+    enunciado: ['', [Validators.required]],
+    tipo: ['OBJETIVA' as TipoQuestao, Validators.required],
+    dificuldade: ['MEDIA' as Dificuldade, Validators.required],
+    alternativas: this.formBuilder.array([])
+  });
+
+  constructor(
+    private readonly questaoService: QuestaoService,
+    private readonly disciplinaService: DisciplinaService,
+    private readonly serieService: SerieService,
+    private readonly assuntoService: AssuntoService
+  ) {}
 
   ngOnInit(): void {
     this.carregarDisciplinas();
+    this.carregarSeries();
+    this.carregarAssuntos();
+    this.carregarQuestoes();
+
+    this.filtrosForm.valueChanges.subscribe(() => {
+      this.carregarQuestoes();
+    });
   }
 
-  carregarDisciplinas(exibirCarregamento = true, limparFeedback = true): void {
+  get alternativasFormArray() {
+    return this.form.get('alternativas') as FormArray;
+  }
+
+  adicionarAlternativa(texto = '', correta = false) {
+    this.alternativasFormArray.push(this.formBuilder.group({
+      texto: [texto, Validators.required],
+      correta: [correta]
+    }));
+  }
+
+  removerAlternativa(index: number) {
+    this.alternativasFormArray.removeAt(index);
+  }
+
+  carregarDisciplinas(): void {
+    this.disciplinaService.listar().subscribe({
+      next: (disciplinas) => this.disciplinas = disciplinas,
+      error: () => this.mensagemErro = 'Nao foi possivel carregar as disciplinas.'
+    });
+  }
+
+  carregarSeries(): void {
+    this.serieService.listar().subscribe({
+      next: (series) => this.series = series,
+      error: () => this.mensagemErro = 'Nao foi possivel carregar as series.'
+    });
+  }
+
+  carregarAssuntos(): void {
+    this.assuntoService.listar().subscribe({
+      next: (assuntos) => this.assuntos = assuntos,
+      error: () => this.mensagemErro = 'Nao foi possivel carregar os assuntos.'
+    });
+  }
+
+  carregarQuestoes(exibirCarregamento = true, limparFeedback = true): void {
     this.carregando = exibirCarregamento;
 
     if (limparFeedback) {
       this.limparMensagens();
     }
 
-    this.disciplinaService.listar()
+    const { disciplinaId, serieId, assuntoId, dificuldade } = this.filtrosForm.getRawValue();
+
+    this.questaoService.listar(disciplinaId ?? undefined, serieId ?? undefined, assuntoId ?? undefined, dificuldade ?? undefined)
       .pipe(finalize(() => this.carregando = false))
       .subscribe({
-        next: (disciplinas) => this.disciplinas = disciplinas,
-        error: () => this.mensagemErro = 'Nao foi possivel carregar as disciplinas.'
+        next: (page) => this.questoes = page.content,
+        error: () => this.mensagemErro = 'Nao foi possivel carregar as questoes.'
       });
   }
 
@@ -374,56 +545,81 @@ export class BancoQuestoesPageComponent implements OnInit {
       return;
     }
 
+    const value = this.form.getRawValue();
+    const alternativas = value.alternativas || [];
+
+    if (alternativas.length < 2) {
+      this.mensagemErro = 'A questao deve ter pelo menos duas alternativas.';
+      return;
+    }
+
+    if (!alternativas.some((a: any) => a.correta)) {
+      this.mensagemErro = 'Pelo menos uma alternativa deve ser correta.';
+      return;
+    }
+
     this.salvando = true;
     this.limparMensagens();
 
-    const payload = this.form.getRawValue();
-    const request$ = this.disciplinaSelecionada
-      ? this.disciplinaService.atualizar(this.disciplinaSelecionada.id, payload)
-      : this.disciplinaService.criar({ nome: payload.nome });
+    // @ts-ignore
+    const payload = this.form.getRawValue() as unknown as QuestaoRequestDTO;
+    const request$ = this.questaoSelecionada
+      ? this.questaoService.atualizar(this.questaoSelecionada.id, payload)
+      : this.questaoService.criar(payload);
 
     request$
       .pipe(finalize(() => this.salvando = false))
       .subscribe({
         next: () => {
-          this.mensagemSucesso = this.disciplinaSelecionada
-            ? 'Disciplina atualizada com sucesso.'
-            : 'Disciplina cadastrada com sucesso.';
+          this.mensagemSucesso = this.questaoSelecionada
+            ? 'Questao atualizada com sucesso.'
+            : 'Questao cadastrada com sucesso.';
           this.cancelarEdicao();
-          this.carregarDisciplinas(false, false);
+          this.carregarQuestoes(false, false);
         },
         error: (error) => {
-          this.mensagemErro = error?.error?.message || 'Nao foi possivel salvar a disciplina.';
+          this.mensagemErro = error?.error?.message || 'Nao foi possivel salvar a questao.';
         }
       });
   }
 
-  editar(disciplina: Disciplina): void {
-    this.disciplinaSelecionada = disciplina;
+  editar(questao: QuestaoResponseDTO): void {
+    this.questaoSelecionada = questao;
     this.limparMensagens();
-    this.form.setValue({
-      nome: disciplina.nome,
-      ativo: disciplina.ativo
+
+    this.alternativasFormArray.clear();
+    questao.alternativas.forEach(alt => {
+       this.adicionarAlternativa(alt.texto, alt.correta);
+    });
+
+    this.form.patchValue({
+      disciplinaId: questao.disciplinaId,
+      serieId: questao.serieId,
+      assuntoId: questao.assuntoId,
+      enunciado: questao.enunciado,
+      tipo: questao.tipo,
+      dificuldade: questao.dificuldade
     });
   }
 
   cancelarEdicao(): void {
-    this.disciplinaSelecionada = undefined;
+    this.questaoSelecionada = undefined;
+    this.alternativasFormArray.clear();
     this.form.reset({
-      nome: '',
-      ativo: true
+      tipo: 'OBJETIVA',
+      dificuldade: 'MEDIA'
     });
   }
 
-  inativar(disciplina: Disciplina): void {
+  excluir(questao: QuestaoResponseDTO): void {
     this.limparMensagens();
 
-    this.disciplinaService.inativar(disciplina.id).subscribe({
+    this.questaoService.excluir(questao.id).subscribe({
       next: () => {
-        this.mensagemSucesso = 'Disciplina inativada com sucesso.';
-        this.carregarDisciplinas(false, false);
+        this.mensagemSucesso = 'Questao excluida com sucesso.';
+        this.carregarQuestoes(false, false);
       },
-      error: () => this.mensagemErro = 'Nao foi possivel inativar a disciplina.'
+      error: () => this.mensagemErro = 'Nao foi possivel excluir a questao.'
     });
   }
 
