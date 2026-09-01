@@ -1,24 +1,25 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { ApiStatusResponse, HealthService } from '../../core/services/health.service';
 
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   template: `
     <section class="dashboard-page">
       <header class="page-header">
         <div>
-          <span class="eyebrow">Visao geral da plataforma</span>
+          <span class="eyebrow">Visão geral da plataforma</span>
           <h1>Bom dia, professora Helena</h1>
-          <p>Acompanhe provas, banco de questoes e correcoes em um unico painel.</p>
+          <p>Acompanhe provas, banco de questões e correções em um único painel.</p>
         </div>
 
         <div class="header-actions">
           <button type="button" class="ghost-button">Semana</button>
-          <button type="button" class="primary-button">Nova avaliacao</button>
+          <a class="primary-button" routerLink="/avaliacoes">Nova avaliação</a>
         </div>
       </header>
 
@@ -32,21 +33,21 @@ import { ApiStatusResponse, HealthService } from '../../core/services/health.ser
         </article>
 
         <article class="kpi-card">
-          <span>Questoes cadastradas</span>
+          <span>Questões cadastradas</span>
           <strong>0</strong>
-          <p>Proxima etapa do banco de questoes.</p>
+          <p>Próxima etapa do banco de questões.</p>
         </article>
 
         <article class="kpi-card">
-          <span>Avaliacoes</span>
+          <span>Avaliações</span>
           <strong>0</strong>
-          <p>Monte provas com versoes e codigos.</p>
+          <p>Monte provas com versões e códigos.</p>
         </article>
 
         <article class="kpi-card">
-          <span>Correcoes</span>
+          <span>Correções</span>
           <strong>0</strong>
-          <p>Servico de visao computacional em preparo.</p>
+          <p>Serviço de visão computacional em preparo.</p>
         </article>
       </div>
 
@@ -54,7 +55,7 @@ import { ApiStatusResponse, HealthService } from '../../core/services/health.ser
         <section class="workbench-card wide">
           <div class="section-title">
             <span>Fluxo principal</span>
-            <strong>Preparar avaliacao</strong>
+            <strong>Preparar avaliação</strong>
           </div>
 
           <div class="timeline">
@@ -62,21 +63,21 @@ import { ApiStatusResponse, HealthService } from '../../core/services/health.ser
               <span>01</span>
               <div>
                 <strong>Organizar disciplinas</strong>
-                <p>Base para series, assuntos, questoes e blocos.</p>
+                <p>Base para séries, assuntos, questões e blocos.</p>
               </div>
             </article>
             <article>
               <span>02</span>
               <div>
-                <strong>Criar banco de questoes</strong>
-                <p>Questoes isoladas ou vinculadas a blocos com imagem/texto.</p>
+                <strong>Criar banco de questões</strong>
+                <p>Questões isoladas ou vinculadas a blocos com imagem/texto.</p>
               </div>
             </article>
             <article>
               <span>03</span>
               <div>
                 <strong>Gerar e corrigir provas</strong>
-                <p>Versoes identificadas por codigo e gabarito salvo.</p>
+                <p>Versões identificadas por código e gabarito salvo.</p>
               </div>
             </article>
           </div>
@@ -91,7 +92,7 @@ import { ApiStatusResponse, HealthService } from '../../core/services/health.ser
           <div class="meter">
             <span></span>
           </div>
-          <p>Comece pelos cadastros simples antes de ativar regras de prova e correcao.</p>
+          <p>Comece pelos cadastros simples antes de ativar regras de prova e correção.</p>
         </section>
       </div>
     </section>
@@ -102,7 +103,8 @@ import { ApiStatusResponse, HealthService } from '../../core/services/health.ser
       letter-spacing: 0.04em;
     }
     .header-actions { display: flex; gap: 10px; flex: 0 0 auto; }
-    button { min-height: 38px; padding: 0 14px; border-radius: var(--pa-radius-sm); font-weight: 800; }
+    button, .primary-button { min-height: 38px; padding: 0 14px; border-radius: var(--pa-radius-sm); font-weight: 800; }
+    .primary-button { display: inline-flex; align-items: center; color: #ffffff; text-decoration: none; }
     .ghost-button { border: 1px solid var(--pa-border); color: var(--pa-ink); background: var(--pa-panel-soft); }
     .primary-button { border: 0; color: #ffffff; background: var(--pa-accent); }
     .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
@@ -161,7 +163,7 @@ export class DashboardPageComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.errorMessage = 'Nao foi possivel consultar o backend.';
+        this.errorMessage = 'Não foi possível consultar o backend.';
         this.loading = false;
       }
     });

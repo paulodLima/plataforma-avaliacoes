@@ -1,6 +1,9 @@
 spring:
   application:
     name: plataforma-avaliacoes-backend
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/plataforma_avaliacoes}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}

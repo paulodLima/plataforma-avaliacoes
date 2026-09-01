@@ -91,7 +91,7 @@ import { FormArray, FormGroup } from '@angular/forms';
                     <span class="row-badge">{{ questao.tipo.slice(0, 3).toUpperCase() }}</span>
                     <span>
                       <strong>{{ questao.enunciado.substring(0, 50) }}{{ questao.enunciado.length > 50 ? '...' : '' }}</strong>
-                      <small>Dificuldade: {{ questao.dificuldade }} | Alternativas: {{ questao.alternativas?.length || 0 }}</small>
+                      <small>Dificuldade: {{ questao.dificuldade }} | Alternativas: {{ questao.alternativas.length || 0 }}</small>
                     </span>
                   </button>
 

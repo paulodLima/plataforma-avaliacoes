@@ -1,13 +1,17 @@
 <div class="app-canvas">
   <div class="app-shell">
-    <aside class="sidebar" aria-label="Navegacao principal">
-      <img
-        class="brand-mark"
-        src="/brand/logo-plataforma-avaliacoes.png"
-        alt="Plataforma de Avaliacoes"
-      />
+    <aside class="sidebar" aria-label="Navegação principal">
+      <div class="sidebar-top">
+        <img
+          class="brand-logo"
+          src="/brand/menu-logo-plataforma-avaliacoes.svg"
+          alt="Plataforma de Avaliações"
+        />
+      </div>
 
       <div class="divider"></div>
+
+      <span class="menu-title">Menu</span>
 
       <nav class="nav-list">
         @for (item of navItems; track item.route) {
@@ -19,7 +23,7 @@
             [title]="item.label"
           >
             <span class="nav-icon">{{ item.icon }}</span>
-            <span class="sr-only">{{ item.label }}</span>
+            <span class="nav-label">{{ item.label }}</span>
           </a>
         }
       </nav>
@@ -29,10 +33,10 @@
       <router-outlet />
     </main>
 
-    <aside class="assist-panel" aria-label="Assistente de avaliacao">
+    <aside class="assist-panel" aria-label="Assistente de avaliação">
       <div class="assist-heading">
-        <span>Assistente de avaliacao</span>
-        <strong>Pro ativo</strong>
+        <span>Assistente de avaliação</span>
+        <strong>Proativo</strong>
       </div>
 
       <section class="assist-card primary">

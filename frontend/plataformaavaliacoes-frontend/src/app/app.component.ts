@@ -8,16 +8,16 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'Plataforma de Avaliacoes';
+  title = 'Plataforma de Avaliações';
 
   navItems = [
-    { label: 'Dashboard', route: '/dashboard', icon: 'IN' },
-    { label: 'Banco de questoes', route: '/banco-questoes', icon: 'BQ' },
-    { label: 'Series', route: '/series', icon: 'SE' },
+    { label: 'Início', route: '/dashboard', icon: 'IN' },
+    { label: 'Banco de questões', route: '/banco-questoes', icon: 'BQ' },
+    { label: 'Séries', route: '/series', icon: 'SE' },
     { label: 'Assuntos', route: '/assuntos', icon: 'AS' },
     { label: 'Blocos', route: '/blocos-questoes', icon: 'BL' },
-    { label: 'Avaliacoes', route: '/avaliacoes', icon: 'AV' },
-    { label: 'Correcao', route: '/correcao', icon: 'CO' },
-    { label: 'Relatorios', route: '/relatorios', icon: 'RE' }
+    { label: 'Avaliações', route: '/avaliacoes', icon: 'AV' },
+    { label: 'Correção', route: '/correcao', icon: 'CO' },
+    { label: 'Relatórios', route: '/relatorios', icon: 'RE' }
   ];
 }
