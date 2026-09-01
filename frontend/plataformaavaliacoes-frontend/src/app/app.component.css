@@ -1,0 +1,255 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  color: var(--pa-ink);
+  background: var(--pa-page);
+}
+
+.app-canvas {
+  min-height: 100vh;
+  padding: 10px;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) 320px;
+  gap: 10px;
+  min-height: calc(100vh - 20px);
+  padding: 10px;
+  border: 1px solid var(--pa-border-strong);
+  border-radius: var(--pa-radius-xl);
+  background: var(--pa-shell);
+}
+
+.sidebar,
+.content,
+.assist-panel {
+  border: 1px solid var(--pa-border);
+  background: var(--pa-panel);
+}
+
+.sidebar {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 10px;
+  background: var(--pa-sidebar);
+}
+
+.brand-mark {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  object-fit: cover;
+  object-position: center 23%;
+  background: #ffffff;
+  box-shadow: var(--pa-shadow-soft);
+}
+
+.divider {
+  width: 38px;
+  height: 1px;
+  background: var(--pa-border-strong);
+}
+
+.nav-list {
+  display: grid;
+  gap: 8px;
+}
+
+.nav-list a {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  color: var(--pa-muted-strong);
+  text-decoration: none;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.nav-list a:hover,
+.nav-list a.active {
+  border-color: var(--pa-border-strong);
+  color: var(--pa-ink);
+  background: var(--pa-panel);
+}
+
+.nav-list a.active {
+  box-shadow: var(--pa-shadow-soft);
+}
+
+.nav-icon {
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.content {
+  min-width: 0;
+  padding: 22px;
+  overflow: hidden;
+}
+
+.assist-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+}
+
+.assist-heading,
+.assist-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.assist-heading span,
+.assist-kicker,
+.assist-row span {
+  color: var(--pa-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.assist-heading strong {
+  padding: 7px 10px;
+  border-radius: 999px;
+  color: var(--pa-accent);
+  background: var(--pa-accent-soft);
+  font-size: 0.78rem;
+}
+
+.assist-card {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid var(--pa-border);
+  background: var(--pa-panel-soft);
+}
+
+.assist-card.primary {
+  color: #ffffff;
+  border-color: transparent;
+  background: var(--pa-ink);
+}
+
+.assist-card h2 {
+  line-height: 1.25;
+}
+
+.assist-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.assist-actions button {
+  min-height: 34px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 999px;
+  color: var(--pa-ink);
+  background: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.queue-list {
+  display: grid;
+  gap: 10px;
+}
+
+.queue-list article {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border-radius: var(--pa-radius-sm);
+  background: #ffffff;
+}
+
+.queue-list span {
+  font-weight: 800;
+}
+
+.queue-list small {
+  color: var(--pa-muted);
+}
+
+.assist-cta {
+  min-height: 46px;
+  margin-top: auto;
+  border: 0;
+  border-radius: var(--pa-radius-md);
+  color: #ffffff;
+  background: var(--pa-accent);
+  font-weight: 800;
+}
+
+@media (max-width: 1120px) {
+  .app-shell {
+    grid-template-columns: 78px minmax(0, 1fr);
+  }
+
+  .assist-panel {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-canvas {
+    padding: 8px;
+  }
+
+  .app-shell {
+    grid-template-columns: 1fr;
+    min-height: calc(100vh - 16px);
+    padding: 10px;
+    border-radius: var(--pa-radius-xl);
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 8px;
+    z-index: 10;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 10px;
+    overflow-x: auto;
+  }
+
+  .brand-mark,
+  .divider {
+    flex: 0 0 auto;
+  }
+
+  .nav-list {
+    display: flex;
+  }
+
+  .nav-list a {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--pa-radius-md);
+  }
+
+  .content {
+    padding: 16px;
+  }
+}

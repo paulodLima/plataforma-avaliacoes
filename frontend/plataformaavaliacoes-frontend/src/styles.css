@@ -1,0 +1,139 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --pa-page: #f4f6f4;
+  --pa-shell: #fbfcfb;
+  --pa-sidebar: #f8faf8;
+  --pa-panel: #ffffff;
+  --pa-panel-soft: #f7f9f7;
+  --pa-border: #e7ece8;
+  --pa-border-strong: #d8e0da;
+  --pa-ink: #1f2a2a;
+  --pa-muted: #6e7c78;
+  --pa-muted-strong: #4e5a57;
+  --pa-accent: #4fa38a;
+  --pa-accent-soft: #eef5f1;
+  --pa-accent-bright: #7cc6ae;
+  --pa-warning: #d6b063;
+  --pa-slate: #8c9ea2;
+  --pa-danger: #b42318;
+  --pa-radius-xl: 22px;
+  --pa-radius-lg: 16px;
+  --pa-radius-md: 12px;
+  --pa-radius-sm: 8px;
+  --pa-font: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --pa-shadow-soft: 0 14px 34px rgba(31, 42, 42, 0.06);
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+  color: var(--pa-ink);
+  background: var(--pa-page);
+  font-family: var(--pa-font);
+  font-size: 15px;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 1.75rem;
+  line-height: 1.18;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+h2 {
+  font-size: 1.05rem;
+  line-height: 1.3;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+p {
+  color: var(--pa-muted);
+  line-height: 1.55;
+}
+
+.page,
+.dashboard-page,
+.banco-page,
+.series-page {
+  display: grid;
+  gap: 18px;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.page-header > div:first-child {
+  display: grid;
+  gap: 7px;
+}
+
+.eyebrow,
+.page > span,
+.panel-heading span,
+.section-title span,
+.quality-card span,
+.guide-card span,
+.kpi-card span {
+  color: var(--pa-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.panel,
+.workbench-card {
+  border: 1px solid var(--pa-border);
+  border-radius: var(--pa-radius-lg);
+  background: var(--pa-panel);
+}
+
+.feedback,
+.state {
+  border-radius: var(--pa-radius-sm);
+}
+
+@media (max-width: 760px) {
+  body {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 1.45rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,71 @@
+<div class="app-canvas">
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Navegacao principal">
+      <img
+        class="brand-mark"
+        src="/brand/logo-plataforma-avaliacoes.png"
+        alt="Plataforma de Avaliacoes"
+      />
+
+      <div class="divider"></div>
+
+      <nav class="nav-list">
+        @for (item of navItems; track item.route) {
+          <a
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            [attr.aria-label]="item.label"
+            [title]="item.label"
+          >
+            <span class="nav-icon">{{ item.icon }}</span>
+            <span class="sr-only">{{ item.label }}</span>
+          </a>
+        }
+      </nav>
+    </aside>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+
+    <aside class="assist-panel" aria-label="Assistente de avaliacao">
+      <div class="assist-heading">
+        <span>Assistente de avaliacao</span>
+        <strong>Pro ativo</strong>
+      </div>
+
+      <section class="assist-card primary">
+        <span class="assist-kicker">Hoje</span>
+        <h2>O que voce quer preparar?</h2>
+        <div class="assist-actions">
+          <button type="button">Gerar prova</button>
+          <button type="button">Criar bloco</button>
+          <button type="button">Iniciar correcao</button>
+        </div>
+      </section>
+
+      <section class="assist-card">
+        <div class="assist-row">
+          <span>Fila de hoje</span>
+          <strong>2</strong>
+        </div>
+
+        <div class="queue-list">
+          <article>
+            <span>Revisar bloco de tirinha</span>
+            <small>Portugues - 8o ano</small>
+          </article>
+          <article>
+            <span>Gerar versoes da prova</span>
+            <small>Matematica - 7o ano</small>
+          </article>
+        </div>
+      </section>
+
+      <button class="assist-cta" type="button">
+        Abrir planejamento
+      </button>
+    </aside>
+  </div>
+</div>
