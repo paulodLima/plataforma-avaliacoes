@@ -1,0 +1,12 @@
+{
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "chat.tools.terminal.autoApprove": {
+        ".\\mvnw": true,
+        "Test-Path": true,
+        "java": true,
+        "&": true,
+        "Set-Content": true,
+        "Add-Type": true
+    }
+}
