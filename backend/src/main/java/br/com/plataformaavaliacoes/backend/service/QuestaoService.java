@@ -2,6 +2,7 @@ package br.com.plataformaavaliacoes.backend.service;
 
 import br.com.plataformaavaliacoes.backend.domain.model.Alternativa;
 import br.com.plataformaavaliacoes.backend.domain.model.Assunto;
+import br.com.plataformaavaliacoes.backend.domain.model.BlocoQuestao;
 import br.com.plataformaavaliacoes.backend.domain.model.Dificuldade;
 import br.com.plataformaavaliacoes.backend.domain.model.Disciplina;
 import br.com.plataformaavaliacoes.backend.domain.model.Questao;
@@ -89,7 +90,13 @@ public class QuestaoService {
     }
 
     private void updateEntityFromDto(Questao questao, QuestaoRequestDTO dto) {
-        questao.setBlocoQuestaoId(dto.getBlocoQuestaoId());
+        if (dto.getBlocoQuestaoId() != null) {
+            BlocoQuestao blocoQuestao = entityManager.find(BlocoQuestao.class, dto.getBlocoQuestaoId());
+            if (blocoQuestao == null) throw new BusinessException("Bloco de Questão não encontrado");
+            questao.setBlocoQuestao(blocoQuestao);
+        } else {
+            questao.setBlocoQuestao(null);
+        }
 
         Disciplina disciplina = entityManager.find(Disciplina.class, dto.getDisciplinaId());
         if (disciplina == null) throw new BusinessException("Disciplina não encontrada");
@@ -127,7 +134,9 @@ public class QuestaoService {
     private QuestaoResponseDTO mapToResponse(Questao questao) {
         QuestaoResponseDTO response = new QuestaoResponseDTO();
         response.setId(questao.getId());
-        response.setBlocoQuestaoId(questao.getBlocoQuestaoId());
+        if (questao.getBlocoQuestao() != null) {
+            response.setBlocoQuestaoId(questao.getBlocoQuestao().getId());
+        }
         response.setDisciplinaId(questao.getDisciplina().getId());
         response.setSerieId(questao.getSerie().getId());
         if (questao.getAssunto() != null) {
