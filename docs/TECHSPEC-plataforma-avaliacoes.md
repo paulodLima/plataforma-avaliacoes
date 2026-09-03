@@ -28,6 +28,7 @@ Regras de arquitetura:
 
 - O frontend consome somente o backend.
 - O backend centraliza regras de negocio, persistencia e integracoes.
+- O backend tambem centraliza autenticacao e dados institucionais da escola e do professor.
 - O servico Python nao acessa diretamente o banco principal.
 - O servico Python retorna dados estruturados para o backend.
 - A documentacao da API do backend deve ser exposta via Swagger/OpenAPI.
@@ -40,6 +41,7 @@ Regras de arquitetura:
 - TypeScript.
 - Angular Router.
 - HttpClient.
+- Guards para rotas autenticadas.
 - Estrutura por `core`, `shared` e `features`.
 - CSS/SCSS conforme padrao do projeto.
 
@@ -51,6 +53,7 @@ Regras de arquitetura:
 - Spring Web.
 - Spring Validation.
 - Spring Data JPA.
+- Spring Security.
 - PostgreSQL Driver.
 - Lombok.
 - Springdoc OpenAPI/Swagger UI.
@@ -133,6 +136,9 @@ frontend/
       pipes/
     features/
       dashboard/
+      auth/
+      escola/
+      professores/
       banco-questoes/
       avaliacoes/
       correcao/
@@ -184,6 +190,51 @@ Campos sugeridos:
 - `ativo`
 - `createdAt`
 - `updatedAt`
+
+#### Escola
+
+Campos sugeridos:
+
+- `id`
+- `nome`
+- `sigla`
+- `logoUrl`
+- `endereco`
+- `bairro`
+- `cidade`
+- `estado`
+- `cep`
+- `telefone`
+- `email`
+- `site`
+- `observacoesCabecalho`
+- `ativo`
+- `createdAt`
+- `updatedAt`
+
+Observacao:
+
+- Os dados da escola devem estar disponiveis para composicao do cabecalho da prova.
+
+#### Professor
+
+Campos sugeridos:
+
+- `id`
+- `escolaId`
+- `nome`
+- `email`
+- `telefone`
+- `senhaHash`
+- `ativo`
+- `createdAt`
+- `updatedAt`
+
+Observacoes:
+
+- `email` deve ser unico.
+- `telefone` pode ser usado como identificador alternativo de login.
+- A senha deve ser armazenada com hash.
 
 #### Serie
 
@@ -280,6 +331,8 @@ Campos sugeridos:
 - `id`
 - `titulo`
 - `descricao`
+- `professorId`
+- `escolaId`
 - `disciplinaId`
 - `serieId`
 - `turma`
@@ -308,6 +361,7 @@ Campos sugeridos:
 Observacao:
 
 - Deve preservar a composicao planejada da avaliacao antes de gerar versoes.
+- Deve referenciar a professora e a escola responsaveis pela prova.
 
 #### AvaliacaoVersao
 
@@ -393,6 +447,79 @@ Resposta:
   "status": "UP",
   "service": "backend"
 }
+
+### Auth
+
+```http
+POST /api/auth/login
+GET /api/auth/me
+```
+
+Request `POST /api/auth/login`:
+
+```json
+{
+  "login": "professora@escola.com",
+  "senha": "Senha123"
+}
+```
+
+Resposta sugerida:
+
+```json
+{
+  "token": "jwt-ou-token-equivalente",
+  "professor": {
+    "id": 1,
+    "nome": "Maria Silva",
+    "email": "professora@escola.com"
+  }
+}
+```
+
+### Escola
+
+```http
+GET /api/escolas
+POST /api/escolas
+GET /api/escolas/{id}
+PUT /api/escolas/{id}
+```
+
+Request `POST /api/escolas`:
+
+```json
+{
+  "nome": "Secretaria de Educacao do Estado",
+  "sigla": "SEDUC",
+  "logoUrl": "https://exemplo.com/logo.png",
+  "endereco": "Rua Exemplo, 100",
+  "cidade": "Palmas",
+  "estado": "TO",
+  "telefone": "(63) 3333-3333"
+}
+```
+
+### Professores
+
+```http
+GET /api/professores
+POST /api/professores
+GET /api/professores/{id}
+PUT /api/professores/{id}
+```
+
+Request `POST /api/professores`:
+
+```json
+{
+  "escolaId": 1,
+  "nome": "Maria Silva",
+  "email": "professora@escola.com",
+  "telefone": "(63) 99999-9999",
+  "senha": "Senha123"
+}
+```
 ```
 
 ### Disciplinas
@@ -503,6 +630,23 @@ Request `POST /api/questoes`:
   ]
 }
 ```
+
+Request `POST /api/avaliacoes`:
+
+```json
+{
+  "titulo": "Prova bimestral",
+  "professorId": 1,
+  "escolaId": 1,
+  "disciplinaId": 1,
+  "serieId": 1,
+  "periodo": "2o bimestre"
+}
+```
+
+Observacao:
+
+- Mesmo quando escola e professor forem inferidos da sessao autenticada, o backend deve garantir que essas referencias fiquem registradas na avaliacao para uso futuro na geracao da prova.
 
 ### Avaliacoes
 

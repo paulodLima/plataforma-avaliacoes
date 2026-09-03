@@ -17,9 +17,10 @@ import br.com.plataformaavaliacoes.backend.dto.AvaliacaoQuestaoRequestDTO;
 import br.com.plataformaavaliacoes.backend.dto.AvaliacaoQuestaoResponseDTO;
 import br.com.plataformaavaliacoes.backend.dto.AvaliacaoRequestDTO;
 import br.com.plataformaavaliacoes.backend.dto.AvaliacaoResponseDTO;
-import br.com.plataformaavaliacoes.backend.dto.QuestaoResponseDTO;
+import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,6 +33,8 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 @RequiredArgsConstructor
 public class AvaliacaoService {
+
+    private static final String AVALIACAO_NAO_ENCONTRADA = "Avaliação não encontrada";
 
     private final AvaliacaoRepository avaliacaoRepository;
     private final AvaliacaoQuestaoRepository avaliacaoQuestaoRepository;
@@ -65,15 +68,12 @@ public class AvaliacaoService {
     }
 
     public AvaliacaoResponseDTO findById(Long id) {
-        Avaliacao avaliacao = avaliacaoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada"));
-        return toDTO(avaliacao);
+        return toDTO(findAvaliacaoById(id));
     }
 
     @Transactional
     public AvaliacaoResponseDTO update(Long id, AvaliacaoRequestDTO dto) {
-        Avaliacao avaliacao = avaliacaoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada"));
+        Avaliacao avaliacao = findAvaliacaoById(id);
 
         Disciplina disciplina = disciplinaRepository.findById(dto.getDisciplinaId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Disciplina não encontrada"));
@@ -93,8 +93,7 @@ public class AvaliacaoService {
 
     @Transactional
     public void delete(Long id) {
-        Avaliacao avaliacao = avaliacaoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada"));
+        Avaliacao avaliacao = findAvaliacaoById(id);
 
         avaliacao.setStatus(StatusAvaliacao.ARQUIVADA);
         avaliacaoRepository.save(avaliacao);
@@ -102,38 +101,21 @@ public class AvaliacaoService {
 
     @Transactional
     public AvaliacaoResponseDTO adicionarQuestoes(Long id, AvaliacaoQuestaoRequestDTO dto) {
-        Avaliacao avaliacao = avaliacaoRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada"));
+        Avaliacao avaliacao = findAvaliacaoById(id);
 
         Integer ordemAtual = avaliacaoQuestaoRepository.countByAvaliacaoId(id);
         if (ordemAtual == null) {
             ordemAtual = 0;
         }
 
+        Set<Long> questoesJaAdicionadas = avaliacaoQuestaoRepository.findByAvaliacaoIdOrderByOrdemAsc(id).stream()
+                .map(aq -> aq.getQuestao().getId())
+                .collect(Collectors.toCollection(HashSet::new));
+
         List<Questao> questoesParaAdicionar = new ArrayList<>();
 
-        if (dto.getQuestaoIds() != null) {
-            for (Long questaoId : dto.getQuestaoIds()) {
-                Questao q = questaoRepository.findById(questaoId)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Questão não encontrada: " + questaoId));
-                questoesParaAdicionar.add(q);
-            }
-        }
-
-        if (dto.getBlocoQuestaoIds() != null) {
-            for (Long blocoId : dto.getBlocoQuestaoIds()) {
-                BlocoQuestao bloco = blocoQuestaoRepository.findById(blocoId)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bloco não encontrado: " + blocoId));
-
-                // Add all active questions from the block, sorted by ID for consistency
-                List<Questao> questoesBloco = bloco.getQuestoes().stream()
-                        .filter(Questao::isAtivo)
-                        .sorted((q1, q2) -> q1.getId().compareTo(q2.getId()))
-                        .collect(Collectors.toList());
-
-                questoesParaAdicionar.addAll(questoesBloco);
-            }
-        }
+        adicionarQuestoesIndividuais(dto.getQuestaoIds(), questoesJaAdicionadas, questoesParaAdicionar);
+        adicionarQuestoesDeBlocos(dto.getBlocoQuestaoIds(), questoesJaAdicionadas, questoesParaAdicionar);
 
         for (Questao questao : questoesParaAdicionar) {
             ordemAtual++;
@@ -151,9 +133,60 @@ public class AvaliacaoService {
     @Transactional
     public void removerQuestao(Long avaliacaoId, Long questaoId) {
         if (!avaliacaoRepository.existsById(avaliacaoId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, AVALIACAO_NAO_ENCONTRADA);
         }
         avaliacaoQuestaoRepository.deleteByAvaliacaoIdAndQuestaoId(avaliacaoId, questaoId);
+    }
+
+    private Avaliacao findAvaliacaoById(Long id) {
+        return avaliacaoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, AVALIACAO_NAO_ENCONTRADA));
+    }
+
+    private void adicionarQuestoesIndividuais(
+            List<Long> questaoIds,
+            Set<Long> questoesJaAdicionadas,
+            List<Questao> questoesParaAdicionar
+    ) {
+        if (questaoIds == null) {
+            return;
+        }
+
+        for (Long questaoId : questaoIds) {
+            Questao questao = questaoRepository.findById(questaoId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Questão não encontrada: " + questaoId));
+            adicionarSeAusente(questao, questoesJaAdicionadas, questoesParaAdicionar);
+        }
+    }
+
+    private void adicionarQuestoesDeBlocos(
+            List<Long> blocoQuestaoIds,
+            Set<Long> questoesJaAdicionadas,
+            List<Questao> questoesParaAdicionar
+    ) {
+        if (blocoQuestaoIds == null) {
+            return;
+        }
+
+        for (Long blocoId : blocoQuestaoIds) {
+            BlocoQuestao bloco = blocoQuestaoRepository.findById(blocoId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bloco não encontrado: " + blocoId));
+
+            List<Questao> questoesBloco = bloco.getQuestoes().stream()
+                    .filter(Questao::isAtivo)
+                    .sorted((q1, q2) -> q1.getId().compareTo(q2.getId()))
+                    .toList();
+
+            for (Questao questaoBloco : questoesBloco) {
+                adicionarSeAusente(questaoBloco, questoesJaAdicionadas, questoesParaAdicionar);
+            }
+        }
+    }
+
+    private void adicionarSeAusente(Questao questao, Set<Long> questoesJaAdicionadas, List<Questao> questoesParaAdicionar) {
+        if (questoesJaAdicionadas.add(questao.getId())) {
+            questoesParaAdicionar.add(questao);
+        }
     }
 
     private AvaliacaoResponseDTO toDTO(Avaliacao avaliacao) {
@@ -181,7 +214,7 @@ public class AvaliacaoService {
             aqDto.setPeso(aq.getPeso());
             aqDto.setCreatedAt(aq.getCreatedAt());
             return aqDto;
-        }).collect(Collectors.toList());
+        }).toList();
 
         dto.setQuestoes(questoesDto);
         return dto;

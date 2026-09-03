@@ -181,6 +181,41 @@ class AvaliacaoVersaoServiceTest {
     }
 
     @Test
+    void testGerarVersoesSemQuestoesThrowsException() {
+        VersaoGeracaoRequestDTO req = new VersaoGeracaoRequestDTO();
+        req.setQuantidadeVersoes(1);
+
+        when(avaliacaoRepository.findById(1L)).thenReturn(Optional.of(avaliacao));
+        when(avaliacaoQuestaoRepository.findByAvaliacaoIdOrderByOrdemAsc(1L)).thenReturn(List.of());
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> avaliacaoVersaoService.gerarVersoes(1L, req));
+        assertEquals(409, ex.getStatusCode().value());
+        assertEquals("Avaliação não possui questões para gerar versões.", ex.getReason());
+    }
+
+    @Test
+    void testListarVersoes() {
+        AvaliacaoVersao versao = new AvaliacaoVersao();
+        versao.setId(99L);
+        versao.setCodigo("ABCDEF");
+
+        GabaritoItem g1 = new GabaritoItem();
+        g1.setNumeroQuestao(1);
+        g1.setQuestao(q1);
+        g1.setLetraCorreta("A");
+
+        when(avaliacaoRepository.existsById(1L)).thenReturn(true);
+        when(avaliacaoVersaoRepository.findByAvaliacaoIdOrderByCreatedAtDesc(1L)).thenReturn(List.of(versao));
+        when(gabaritoItemRepository.findByAvaliacaoVersaoIdOrderByNumeroQuestaoAsc(99L)).thenReturn(List.of(g1));
+
+        List<AvaliacaoVersaoResponseDTO> response = avaliacaoVersaoService.listarVersoes(1L);
+
+        assertEquals(1, response.size());
+        assertEquals("ABCDEF", response.get(0).getCodigo());
+        assertEquals(1, response.get(0).getGabarito().size());
+    }
+
+    @Test
     void testGerarVersoesSemAlternativaCorretaThrowsException() {
         VersaoGeracaoRequestDTO req = new VersaoGeracaoRequestDTO();
         req.setQuantidadeVersoes(1);

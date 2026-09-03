@@ -35,6 +35,12 @@ public class AvaliacaoVersaoController {
         return avaliacaoVersaoService.gerarVersoes(id, request);
     }
 
+    @GetMapping("/{id}/versoes")
+    @Operation(summary = "Listar versões de uma avaliação")
+    public List<AvaliacaoVersaoResponseDTO> listarVersoes(@PathVariable Long id) {
+        return avaliacaoVersaoService.listarVersoes(id);
+    }
+
     @GetMapping("/versoes/{codigo}")
     @Operation(summary = "Consultar versão de avaliação por código")
     public AvaliacaoVersaoResponseDTO findByCodigo(@PathVariable String codigo) {

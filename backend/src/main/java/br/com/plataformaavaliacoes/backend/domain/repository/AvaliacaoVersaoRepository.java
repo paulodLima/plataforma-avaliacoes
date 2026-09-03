@@ -12,4 +12,5 @@ public interface AvaliacaoVersaoRepository extends JpaRepository<AvaliacaoVersao
     boolean existsByCodigo(String codigo);
     Optional<AvaliacaoVersao> findByCodigo(String codigo);
     List<AvaliacaoVersao> findByAvaliacaoId(Long avaliacaoId);
+    List<AvaliacaoVersao> findByAvaliacaoIdOrderByCreatedAtDesc(Long avaliacaoId);
 }

@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { AssuntosPageComponent } from './features/assuntos/assuntos-page.component';
 import { AvaliacaoDetalhePageComponent } from './features/avaliacoes/avaliacao-detalhe-page.component';
+import { AvaliacaoVersoesPageComponent } from './features/avaliacoes/avaliacao-versoes-page.component';
 import { AvaliacoesPageComponent } from './features/avaliacoes/avaliacoes-page.component';
 import { BancoQuestoesPageComponent } from './features/banco-questoes/banco-questoes-page.component';
 import { BlocosQuestoesPageComponent } from './features/blocos-questoes/blocos-questoes-page.component';
@@ -18,6 +19,7 @@ export const routes: Routes = [
   { path: 'blocos-questoes', component: BlocosQuestoesPageComponent },
   { path: 'avaliacoes', component: AvaliacoesPageComponent },
   { path: 'avaliacoes/:id', component: AvaliacaoDetalhePageComponent },
+  { path: 'avaliacoes/:id/versoes', component: AvaliacaoVersoesPageComponent },
   { path: 'correcao', component: CorrecaoPageComponent },
   { path: 'relatorios', component: RelatoriosPageComponent },
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },

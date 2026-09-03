@@ -1,0 +1,17 @@
+
+> plataformaavaliacoes-frontend@0.0.0 build
+> ng build
+
+[33mÔØ»[39m Building...
+[32mÔ£ö[39m Building...
+[1mInitial chunk files[22m  [2m | [22m[1mNames[22m        [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mmain-5I4OWHCK.js[39m     [2m | [22m[2mmain[22m         [2m | [22m[36m373.99 kB[39m[2m | [22m               [36m85.70 kB[39m
+[32mpolyfills-5CFQRCPP.js[39m[2m | [22m[2mpolyfills[22m    [2m | [22m [36m34.59 kB[39m[2m | [22m               [36m11.33 kB[39m
+[32mstyles-X7U6F3BD.css[39m  [2m | [22m[2mstyles[22m       [2m | [22m  [36m1.69 kB[39m[2m | [22m              [36m691 bytes[39m
+
+[1m [22m                    [2m | [22m[1mInitial total[22m[2m | [22m[1m410.26 kB[22m[2m | [22m               [1m97.73 kB[22m
+
+Application bundle generation complete. [3.774 seconds]
+
+Output location: C:\Users\paulos\Documents\plataforma-avaliacoes\frontend\plataformaavaliacoes-frontend\dist\plataformaavaliacoes-frontend
+

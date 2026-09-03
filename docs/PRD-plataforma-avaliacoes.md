@@ -31,6 +31,9 @@ Esse processo e demorado, propenso a erros e dificulta acompanhar quais conteudo
 ### Objetivos do Produto
 
 - Centralizar o banco de questoes da professora.
+- Permitir autenticacao basica para acesso ao sistema.
+- Permitir cadastrar a escola e seus dados institucionais para uso nas provas.
+- Permitir cadastrar e manter os dados da professora responsavel.
 - Permitir cadastro de questoes individuais e blocos de questoes com texto/imagem compartilhados.
 - Facilitar a montagem de avaliacoes por disciplina, serie, turma, assunto e dificuldade.
 - Gerar versoes diferentes de uma mesma avaliacao.
@@ -54,6 +57,10 @@ Esse processo e demorado, propenso a erros e dificulta acompanhar quais conteudo
 
 Professora do ensino fundamental ou medio que cria e corrige provas com frequencia.
 
+### Usuario Administrador Inicial
+
+Usuario responsavel por cadastrar a escola e criar o acesso inicial da professora.
+
 ### Usuarios Futuros
 
 - Outros professores da escola.
@@ -75,6 +82,16 @@ Dores principais:
 - demora muito para corrigir provas objetivas;
 - tem dificuldade para enxergar quais assuntos a turma errou mais.
 
+### Escola
+
+Precisa manter uma identidade institucional minima para que as provas geradas saiam com dados corretos de nome, sigla, endereco e elementos visuais.
+
+Dores principais:
+
+- cabecalhos de prova sao montados manualmente;
+- logo, nome e sigla da escola ficam inconsistentes entre documentos;
+- faltam dados institucionais centralizados para reaproveitar nas provas.
+
 ### Coordenador Pedagogico
 
 Precisa acompanhar o desempenho das turmas e entender lacunas de aprendizagem.
@@ -91,6 +108,9 @@ O primeiro ciclo do produto deve criar uma base funcional, sem implementar ainda
 
 ### Dentro do Escopo Inicial
 
+- Login basico com nome, email, telefone e senha.
+- Cadastro de escola com dados institucionais basicos.
+- Cadastro de professor vinculado ao acesso da aplicacao.
 - Cadastro e listagem de disciplinas.
 - Cadastro e listagem de series/turmas.
 - Cadastro e listagem de assuntos.
@@ -113,7 +133,7 @@ O primeiro ciclo do produto deve criar uma base funcional, sem implementar ainda
 - Correcao real de bolhas ou marcacoes.
 - Identificacao precisa de respostas em imagens reais.
 - Geracao final de PDF com JasperReports.
-- Login completo com perfis de usuario.
+- Controle avancado de perfis e permissoes.
 - Importacao automatica de questoes por IA.
 - Portal do aluno.
 - Relatorios pedagogicos avancados.
@@ -132,6 +152,14 @@ O primeiro ciclo do produto deve criar uma base funcional, sem implementar ainda
 - O servico Python deve ser especializado em imagem, sem assumir regras de negocio principais.
 
 ## 8. Jornada Principal
+
+### Fluxo 0 - Acesso e Identificacao Institucional
+
+1. O usuario acessa a tela de login.
+2. Informa email ou telefone e senha.
+3. Acessa o sistema com seu cadastro de professor.
+4. Mantem os dados da escola e do professor atualizados.
+5. Ao gerar a prova, o sistema reutiliza nome, sigla, endereco, logo e identificacao da professora.
 
 ### Fluxo 1 - Cadastro do Banco de Questoes
 
@@ -158,7 +186,8 @@ O primeiro ciclo do produto deve criar uma base funcional, sem implementar ainda
 3. O sistema gera um codigo unico para cada versao.
 4. O sistema define a ordem das questoes e alternativas.
 5. O sistema salva o gabarito exato daquela versao.
-6. Futuramente, o sistema gera o PDF da prova no padrao da escola.
+6. O sistema reutiliza dados da escola e do professor no cabecalho da prova.
+7. Futuramente, o sistema gera o PDF da prova no padrao da escola.
 
 ### Fluxo 4 - Correcao Futura por Imagem
 
@@ -175,6 +204,32 @@ O primeiro ciclo do produto deve criar uma base funcional, sem implementar ainda
 ### RF01 - Gerenciar Disciplinas
 
 O sistema deve permitir criar, listar, editar e inativar disciplinas.
+
+### RF00 - Autenticar Usuario
+
+O sistema deve permitir login com credencial identificada por email ou telefone e senha.
+
+### RF00B - Gerenciar Escola
+
+O sistema deve permitir cadastrar e editar os dados institucionais da escola usados nas provas.
+
+Dados minimos esperados:
+
+- nome da escola;
+- sigla ou abreviacao, por exemplo `SEDUC`;
+- logo;
+- endereco;
+- estado;
+- cidade;
+- telefone e outros campos uteis definidos na implementacao.
+
+### RF00C - Gerenciar Professor
+
+O sistema deve permitir cadastrar e editar dados da professora responsavel, incluindo nome, email, telefone e senha.
+
+### RF00D - Reutilizar Dados Institucionais na Prova
+
+Ao gerar uma prova, o sistema deve conseguir recuperar dados da escola e do professor para preencher o cabecalho e a identificacao do documento.
 
 ### RF02 - Gerenciar Series/Turmas
 
@@ -257,6 +312,10 @@ O sistema nao deve perder o gabarito de uma prova ja gerada, mesmo que a questao
 ### RNF07 - Usabilidade
 
 A interface deve ser responsiva, simples e adequada para uso frequente.
+
+### RNF08 - Seguranca Basica
+
+Senhas nao devem ser persistidas em texto puro e o backend deve centralizar a autenticacao do acesso.
 
 ### RNF08 - Documentacao
 

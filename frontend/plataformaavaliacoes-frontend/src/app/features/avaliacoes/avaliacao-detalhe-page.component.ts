@@ -39,6 +39,7 @@ import { Serie } from '../../shared/models/serie.model';
                 | {{ avaliacao.periodo }}
               }
             </p>
+            <a class="back-link versions-link" [routerLink]="['/avaliacoes', avaliacao.id, 'versoes']">Gerar e consultar versões</a>
           </div>
 
           <div class="status-panel" aria-label="Resumo da composição">
@@ -166,6 +167,7 @@ import { Serie } from '../../shared/models/serie.model';
       font-weight: 800;
       text-decoration: none;
     }
+    .versions-link { margin-top: 10px; }
     .detail-header { align-items: stretch; }
     .status-panel {
       display: grid;
@@ -410,8 +412,7 @@ export class AvaliacaoDetalhePageComponent implements OnInit {
   }
 
   adicionarBloco(blocoQuestaoId: number): void {
-    const questoesDoBloco = this.questoesDisponiveis.filter((questao) => questao.blocoQuestaoId === blocoQuestaoId);
-    this.adicionarQuestoes(questoesDoBloco, 'Bloco adicionado à avaliação.');
+    this.adicionarQuestoes([], 'Bloco adicionado à avaliação.', [blocoQuestaoId]);
   }
 
   removerQuestao(questao: QuestaoResponseDTO): void {
@@ -470,7 +471,7 @@ export class AvaliacaoDetalhePageComponent implements OnInit {
       });
   }
 
-  private adicionarQuestoes(questoes: QuestaoResponseDTO[], sucesso: string): void {
+  private adicionarQuestoes(questoes: QuestaoResponseDTO[], sucesso: string, blocoQuestaoIds?: number[]): void {
     if (!this.avaliacao || !questoes.length) {
       return;
     }
@@ -478,7 +479,7 @@ export class AvaliacaoDetalhePageComponent implements OnInit {
     this.salvando = true;
     this.limparMensagens();
 
-    this.avaliacaoService.adicionarQuestoes(this.avaliacao, questoes)
+    this.avaliacaoService.adicionarQuestoes(this.avaliacao, questoes, blocoQuestaoIds)
       .pipe(finalize(() => this.salvando = false))
       .subscribe({
         next: (avaliacao) => {

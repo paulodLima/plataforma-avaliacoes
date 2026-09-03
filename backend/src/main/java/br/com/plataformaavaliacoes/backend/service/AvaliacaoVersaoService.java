@@ -45,6 +45,9 @@ public class AvaliacaoVersaoService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada"));
 
         List<AvaliacaoQuestao> avaliacaoQuestoes = avaliacaoQuestaoRepository.findByAvaliacaoIdOrderByOrdemAsc(avaliacaoId);
+        if (avaliacaoQuestoes.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Avaliação não possui questões para gerar versões.");
+        }
 
         List<AvaliacaoVersaoResponseDTO> respostas = new ArrayList<>();
 
@@ -99,6 +102,21 @@ public class AvaliacaoVersaoService {
         }
 
         return respostas;
+    }
+
+    @Transactional(readOnly = true)
+    public List<AvaliacaoVersaoResponseDTO> listarVersoes(Long avaliacaoId) {
+        if (!avaliacaoRepository.existsById(avaliacaoId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada");
+        }
+
+        return avaliacaoVersaoRepository.findByAvaliacaoIdOrderByCreatedAtDesc(avaliacaoId).stream()
+                .map(versao -> {
+                    List<GabaritoItem> gabaritoItens = gabaritoItemRepository
+                            .findByAvaliacaoVersaoIdOrderByNumeroQuestaoAsc(versao.getId());
+                    return mapToResponseDTO(versao, gabaritoItens);
+                })
+                .toList();
     }
 
     private List<Questao> processarQuestoes(List<AvaliacaoQuestao> avaliacaoQuestoes, boolean embaralhar) {

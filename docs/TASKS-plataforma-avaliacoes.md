@@ -202,6 +202,166 @@ Aceite:
 - URL base vem de environment/configuracao.
 - Dashboard exibe status simples do backend.
 
+## Fase 1B - Acesso e Identidade Institucional
+
+### TASK-050 - Definir modelo de autenticacao inicial
+
+- Area: backend, frontend, docs
+- Prioridade: P0
+- Depende de: TASK-004, TASK-009
+
+Descricao:
+
+Definir a estrategia inicial de login do sistema para professor, incluindo sessao/token, regras de senha e protecao das rotas principais.
+
+Aceite:
+
+- Existe decisao documentada para autenticacao inicial.
+- Backend possui base tecnica para login.
+- Frontend sabe como persistir a sessao autenticada.
+- Rotas de negocio podem ser protegidas.
+
+### TASK-051 - Implementar entidade e CRUD de Escola
+
+- Area: backend
+- Prioridade: P1
+- Depende de: TASK-004, TASK-006, TASK-050
+
+Descricao:
+
+Criar entidade, repository, service, DTOs e controller para dados institucionais da escola.
+
+Aceite:
+
+- `GET /api/escolas` lista escolas.
+- `POST /api/escolas` cria escola.
+- `GET /api/escolas/{id}` consulta por ID.
+- `PUT /api/escolas/{id}` atualiza escola.
+- Payload contempla nome, sigla, logo, endereco, cidade, estado e contatos basicos.
+- Payload invalido retorna `400`.
+
+### TASK-052 - Criar tela de Escola
+
+- Area: frontend
+- Prioridade: P1
+- Depende de: TASK-051
+
+Descricao:
+
+Criar interface para cadastrar e editar os dados da escola.
+
+Aceite:
+
+- Tela exibe formulario institucional.
+- Permite cadastrar nome, sigla, logo, endereco, estado e dados uteis adicionais.
+- Exibe loading, erro e sucesso.
+- Dados ficam preparados para reutilizacao na geracao da prova.
+
+### TASK-053 - Implementar entidade e CRUD de Professor
+
+- Area: backend
+- Prioridade: P1
+- Depende de: TASK-050, TASK-051
+
+Descricao:
+
+Criar entidade, repository, service, DTOs e controller para professores com dados de acesso.
+
+Aceite:
+
+- `GET /api/professores` lista professores.
+- `POST /api/professores` cria professor.
+- `GET /api/professores/{id}` consulta por ID.
+- `PUT /api/professores/{id}` atualiza professor.
+- Professor possui nome, email, telefone, escola e senha.
+- Email deve ser unico.
+- Senha e persistida de forma segura, sem texto puro.
+
+### TASK-054 - Criar tela de Professores
+
+- Area: frontend
+- Prioridade: P1
+- Depende de: TASK-053
+
+Descricao:
+
+Criar interface para cadastrar e editar professores.
+
+Aceite:
+
+- Tela lista professores.
+- Permite cadastrar nome, email, telefone e escola.
+- Possui formulario para senha inicial.
+- Exibe loading, erro e sucesso.
+
+### TASK-055 - Implementar login no backend
+
+- Area: backend
+- Prioridade: P1
+- Depende de: TASK-050, TASK-053
+
+Descricao:
+
+Implementar endpoint de autenticacao para professor usando email ou telefone e senha.
+
+Aceite:
+
+- `POST /api/auth/login` autentica credencial valida.
+- Login aceita email ou telefone como identificador.
+- Credencial invalida retorna erro controlado.
+- Existe endpoint para obter usuario autenticado ou sessao corrente.
+
+### TASK-056 - Criar tela de Login no frontend
+
+- Area: frontend
+- Prioridade: P1
+- Depende de: TASK-055
+
+Descricao:
+
+Criar tela de login e controle basico de sessao na aplicacao Angular.
+
+Aceite:
+
+- Tela possui campo de login e senha.
+- Frontend persiste sessao autenticada.
+- Rotas principais exigem autenticacao.
+- Logout basico e suportado.
+
+### TASK-057 - Vincular escola e professor a avaliacao
+
+- Area: backend, frontend
+- Prioridade: P1
+- Depende de: TASK-051, TASK-053, TASK-055, TASK-025
+
+Descricao:
+
+Garantir que cada avaliacao registre a escola e o professor responsaveis para uso futuro no cabecalho da prova.
+
+Aceite:
+
+- Avaliacao persiste referencia de escola e professor.
+- Backend devolve esses dados ou IDs nas consultas de avaliacao.
+- Frontend cria avaliacao considerando contexto autenticado.
+- Dados ficam prontos para geracao de prova.
+
+### TASK-058 - Exibir dados institucionais no template da prova
+
+- Area: backend, docs
+- Prioridade: P2
+- Depende de: TASK-039, TASK-051, TASK-053, TASK-057
+
+Descricao:
+
+Atualizar o modelo de prova para contemplar nome, sigla, logo e identificacao do professor.
+
+Aceite:
+
+- Documento de template cita nome e sigla da escola.
+- Documento define onde entra a logo.
+- Documento define como nome do professor aparece.
+- Dados usados no template vem da avaliacao e do contexto institucional.
+
 ## Fase 2 - Cadastros Base
 
 ### TASK-012 - Implementar entidade e CRUD de Disciplina

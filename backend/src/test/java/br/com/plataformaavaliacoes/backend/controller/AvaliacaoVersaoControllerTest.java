@@ -60,4 +60,16 @@ class AvaliacaoVersaoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value("ABCDEF"));
     }
+
+    @Test
+    void testListarVersoes() throws Exception {
+        AvaliacaoVersaoResponseDTO res = new AvaliacaoVersaoResponseDTO();
+        res.setCodigo("ZXCVBN");
+
+        when(avaliacaoVersaoService.listarVersoes(1L)).thenReturn(List.of(res));
+
+        mockMvc.perform(get("/api/avaliacoes/1/versoes"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].codigo").value("ZXCVBN"));
+    }
 }

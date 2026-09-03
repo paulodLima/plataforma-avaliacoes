@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface BlocoQuestao {
   id?: number;
@@ -25,7 +26,7 @@ export interface PaginatedBlocoQuestao {
   providedIn: 'root'
 })
 export class BlocoQuestaoService {
-  private apiUrl = '/api/blocos-questoes';
+  private readonly apiUrl = `${environment.apiUrl}/blocos-questoes`;
 
   constructor(private http: HttpClient) {}
 
