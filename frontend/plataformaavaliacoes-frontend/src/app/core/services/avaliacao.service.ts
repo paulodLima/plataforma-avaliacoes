@@ -125,6 +125,8 @@ export class AvaliacaoService {
       titulo: payload.titulo,
       disciplinaId: Number(payload.disciplinaId),
       serieId: Number(payload.serieId),
+      escolaId: payload.escolaId,
+      professorId: payload.professorId,
       periodo: payload.periodo?.trim() || undefined,
       status: 'RASCUNHO',
       questoes: [],

@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @SpringBootTest
+@org.springframework.security.test.context.support.WithMockUser
 class CorsConfigTests {
 
     @Autowired

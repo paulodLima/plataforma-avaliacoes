@@ -13,6 +13,8 @@ public class AvaliacaoResponseDTO {
     private String descricao;
     private Long disciplinaId;
     private Long serieId;
+    private Long escolaId;
+    private Long professorId;
     private String turma;
     private String periodo;
     private StatusAvaliacao status;

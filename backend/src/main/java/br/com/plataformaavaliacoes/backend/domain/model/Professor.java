@@ -2,8 +2,6 @@ package br.com.plataformaavaliacoes.backend.domain.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,52 +10,40 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
-import br.com.plataformaavaliacoes.backend.domain.model.Escola;
-import br.com.plataformaavaliacoes.backend.domain.model.Professor;
 import jakarta.persistence.Table;
-import java.time.OffsetDateTime;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.OffsetDateTime;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "avaliacoes")
-public class Avaliacao {
+@Table(name = "professores")
+public class Professor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String titulo;
+    private String nome;
 
-    @Column(columnDefinition = "TEXT")
-    private String descricao;
+    @Column(unique = true, nullable = false)
+    private String email;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "disciplina_id", nullable = false)
-    private Disciplina disciplina;
+    @Column(unique = true)
+    private String telefone;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "serie_id", nullable = false)
-    private Serie serie;
+    @Column(nullable = false)
+    private String senha;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "escola_id")
+    @JoinColumn(name = "escola_id", nullable = false)
     private Escola escola;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "professor_id")
-    private Professor professor;
-
-    private String turma;
-
-    private String periodo;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 50)
-    private StatusAvaliacao status = StatusAvaliacao.RASCUNHO;
+    @Column(nullable = false)
+    private boolean ativo = true;
 
     @Column(nullable = false, updatable = false)
     private OffsetDateTime createdAt;

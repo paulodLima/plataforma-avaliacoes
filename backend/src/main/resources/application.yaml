@@ -27,6 +27,9 @@ app:
   services:
     gabarito-url: ${GABARITO_SERVICE_URL:http://localhost:8001}
 
+jwt:
+  secret: ${JWT_SECRET:EsteEhUmSegredoMuitoLongoParaJWTQuePrecisaTerPeloMenos256BitsParaSerSeguro}
+
 springdoc:
   api-docs:
     path: /v3/api-docs

@@ -10,18 +10,25 @@ import { CorrecaoPageComponent } from './features/correcao/correcao-page.compone
 import { DashboardPageComponent } from './features/dashboard/dashboard-page.component';
 import { RelatoriosPageComponent } from './features/relatorios/relatorios-page.component';
 import { SeriesPageComponent } from './features/series/series-page.component';
+import { LoginPageComponent } from './features/auth/login-page.component';
+import { EscolasPageComponent } from './features/escolas/escolas-page.component';
+import { ProfessoresPageComponent } from './features/professores/professores-page.component';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  { path: 'dashboard', component: DashboardPageComponent },
-  { path: 'banco-questoes', component: BancoQuestoesPageComponent },
-  { path: 'series', component: SeriesPageComponent },
-  { path: 'assuntos', component: AssuntosPageComponent },
-  { path: 'blocos-questoes', component: BlocosQuestoesPageComponent },
-  { path: 'avaliacoes', component: AvaliacoesPageComponent },
-  { path: 'avaliacoes/:id', component: AvaliacaoDetalhePageComponent },
-  { path: 'avaliacoes/:id/versoes', component: AvaliacaoVersoesPageComponent },
-  { path: 'correcao', component: CorrecaoPageComponent },
-  { path: 'relatorios', component: RelatoriosPageComponent },
+  { path: 'login', component: LoginPageComponent },
+  { path: 'dashboard', component: DashboardPageComponent, canActivate: [authGuard] },
+  { path: 'escolas', component: EscolasPageComponent, canActivate: [authGuard] },
+  { path: 'professores', component: ProfessoresPageComponent, canActivate: [authGuard] },
+  { path: 'banco-questoes', component: BancoQuestoesPageComponent, canActivate: [authGuard] },
+  { path: 'series', component: SeriesPageComponent, canActivate: [authGuard] },
+  { path: 'assuntos', component: AssuntosPageComponent, canActivate: [authGuard] },
+  { path: 'blocos-questoes', component: BlocosQuestoesPageComponent, canActivate: [authGuard] },
+  { path: 'avaliacoes', component: AvaliacoesPageComponent, canActivate: [authGuard] },
+  { path: 'avaliacoes/:id', component: AvaliacaoDetalhePageComponent, canActivate: [authGuard] },
+  { path: 'avaliacoes/:id/versoes', component: AvaliacaoVersoesPageComponent, canActivate: [authGuard] },
+  { path: 'correcao', component: CorrecaoPageComponent, canActivate: [authGuard] },
+  { path: 'relatorios', component: RelatoriosPageComponent, canActivate: [authGuard] },
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   { path: '**', redirectTo: 'dashboard' }
 ];
