@@ -2,6 +2,7 @@ package br.com.plataformaavaliacoes.backend.controller;
 
 import br.com.plataformaavaliacoes.backend.dto.ProfessorRequestDTO;
 import br.com.plataformaavaliacoes.backend.dto.ProfessorResponseDTO;
+import br.com.plataformaavaliacoes.backend.dto.ProfessorUpdateDTO;
 import br.com.plataformaavaliacoes.backend.service.ProfessorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,7 +49,7 @@ public class ProfessorController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar um professor existente")
-    public ProfessorResponseDTO update(@PathVariable Long id, @Valid @RequestBody ProfessorRequestDTO dto) {
+    public ProfessorResponseDTO update(@PathVariable Long id, @Valid @RequestBody ProfessorUpdateDTO dto) {
         return professorService.update(id, dto);
     }
 }

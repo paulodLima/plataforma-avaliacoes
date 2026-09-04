@@ -6,6 +6,7 @@ import br.com.plataformaavaliacoes.backend.domain.repository.EscolaRepository;
 import br.com.plataformaavaliacoes.backend.domain.repository.ProfessorRepository;
 import br.com.plataformaavaliacoes.backend.dto.ProfessorRequestDTO;
 import br.com.plataformaavaliacoes.backend.dto.ProfessorResponseDTO;
+import br.com.plataformaavaliacoes.backend.dto.ProfessorUpdateDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -57,7 +58,7 @@ public class ProfessorService {
     }
 
     @Transactional
-    public ProfessorResponseDTO update(Long id, ProfessorRequestDTO dto) {
+    public ProfessorResponseDTO update(Long id, ProfessorUpdateDTO dto) {
         Professor professor = professorRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor não encontrado"));
 
