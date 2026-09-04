@@ -18,6 +18,10 @@ public class AvaliacaoRequestDTO {
     @NotNull(message = "Série é obrigatória")
     private Long serieId;
 
+    private Long escolaId;
+
+    private Long professorId;
+
     private String turma;
 
     private String periodo;

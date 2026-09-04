@@ -7,6 +7,8 @@ export interface Avaliacao {
   titulo: string;
   disciplinaId: number;
   serieId: number;
+  escolaId?: number;
+  professorId?: number;
   periodo?: string;
   status: AvaliacaoStatus;
   questoes: QuestaoResponseDTO[];
@@ -18,6 +20,8 @@ export interface AvaliacaoPayload {
   titulo: string;
   disciplinaId: number;
   serieId: number;
+  escolaId?: number;
+  professorId?: number;
   periodo?: string;
 }
 

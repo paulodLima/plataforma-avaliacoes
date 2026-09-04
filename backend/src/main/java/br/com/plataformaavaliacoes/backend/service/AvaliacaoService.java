@@ -4,6 +4,8 @@ import br.com.plataformaavaliacoes.backend.domain.model.Avaliacao;
 import br.com.plataformaavaliacoes.backend.domain.model.AvaliacaoQuestao;
 import br.com.plataformaavaliacoes.backend.domain.model.BlocoQuestao;
 import br.com.plataformaavaliacoes.backend.domain.model.Disciplina;
+import br.com.plataformaavaliacoes.backend.domain.model.Escola;
+import br.com.plataformaavaliacoes.backend.domain.model.Professor;
 import br.com.plataformaavaliacoes.backend.domain.model.Questao;
 import br.com.plataformaavaliacoes.backend.domain.model.Serie;
 import br.com.plataformaavaliacoes.backend.domain.model.StatusAvaliacao;
@@ -11,6 +13,8 @@ import br.com.plataformaavaliacoes.backend.domain.repository.AvaliacaoQuestaoRep
 import br.com.plataformaavaliacoes.backend.domain.repository.AvaliacaoRepository;
 import br.com.plataformaavaliacoes.backend.domain.repository.BlocoQuestaoRepository;
 import br.com.plataformaavaliacoes.backend.domain.repository.DisciplinaRepository;
+import br.com.plataformaavaliacoes.backend.domain.repository.EscolaRepository;
+import br.com.plataformaavaliacoes.backend.domain.repository.ProfessorRepository;
 import br.com.plataformaavaliacoes.backend.domain.repository.QuestaoRepository;
 import br.com.plataformaavaliacoes.backend.domain.repository.SerieRepository;
 import br.com.plataformaavaliacoes.backend.dto.AvaliacaoQuestaoRequestDTO;
@@ -40,6 +44,8 @@ public class AvaliacaoService {
     private final AvaliacaoQuestaoRepository avaliacaoQuestaoRepository;
     private final DisciplinaRepository disciplinaRepository;
     private final SerieRepository serieRepository;
+    private final EscolaRepository escolaRepository;
+    private final ProfessorRepository professorRepository;
     private final QuestaoRepository questaoRepository;
     private final BlocoQuestaoRepository blocoQuestaoRepository;
     private final QuestaoService questaoService;
@@ -56,6 +62,19 @@ public class AvaliacaoService {
         avaliacao.setDescricao(dto.getDescricao());
         avaliacao.setDisciplina(disciplina);
         avaliacao.setSerie(serie);
+
+        if (dto.getEscolaId() != null) {
+            Escola escola = escolaRepository.findById(dto.getEscolaId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Escola não encontrada"));
+            avaliacao.setEscola(escola);
+        }
+
+        if (dto.getProfessorId() != null) {
+            Professor professor = professorRepository.findById(dto.getProfessorId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor não encontrado"));
+            avaliacao.setProfessor(professor);
+        }
+
         avaliacao.setTurma(dto.getTurma());
         avaliacao.setPeriodo(dto.getPeriodo());
 
@@ -84,6 +103,19 @@ public class AvaliacaoService {
         avaliacao.setDescricao(dto.getDescricao());
         avaliacao.setDisciplina(disciplina);
         avaliacao.setSerie(serie);
+
+        if (dto.getEscolaId() != null) {
+            Escola escola = escolaRepository.findById(dto.getEscolaId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Escola não encontrada"));
+            avaliacao.setEscola(escola);
+        }
+
+        if (dto.getProfessorId() != null) {
+            Professor professor = professorRepository.findById(dto.getProfessorId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Professor não encontrado"));
+            avaliacao.setProfessor(professor);
+        }
+
         avaliacao.setTurma(dto.getTurma());
         avaliacao.setPeriodo(dto.getPeriodo());
 
@@ -196,6 +228,15 @@ public class AvaliacaoService {
         dto.setDescricao(avaliacao.getDescricao());
         dto.setDisciplinaId(avaliacao.getDisciplina().getId());
         dto.setSerieId(avaliacao.getSerie().getId());
+
+        if (avaliacao.getEscola() != null) {
+            dto.setEscolaId(avaliacao.getEscola().getId());
+        }
+
+        if (avaliacao.getProfessor() != null) {
+            dto.setProfessorId(avaliacao.getProfessor().getId());
+        }
+
         dto.setTurma(avaliacao.getTurma());
         dto.setPeriodo(avaliacao.getPeriodo());
         dto.setStatus(avaliacao.getStatus());

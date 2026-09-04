@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
+import { AuthService } from '../../core/services/auth.service';
 import { AvaliacaoService } from '../../core/services/avaliacao.service';
 import { DisciplinaService } from '../../core/services/disciplina.service';
 import { SerieService } from '../../core/services/serie.service';
@@ -322,7 +323,8 @@ export class AvaliacoesPageComponent implements OnInit {
   constructor(
     private readonly avaliacaoService: AvaliacaoService,
     private readonly disciplinaService: DisciplinaService,
-    private readonly serieService: SerieService
+    private readonly serieService: SerieService,
+    private readonly authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -356,10 +358,14 @@ export class AvaliacoesPageComponent implements OnInit {
     this.salvando = true;
     this.limparMensagens();
 
+    const user = this.authService.currentUser();
+
     this.avaliacaoService.criar({
       titulo: value.titulo?.trim() || '',
       disciplinaId: Number(value.disciplinaId),
       serieId: Number(value.serieId),
+      escolaId: user?.escolaId,
+      professorId: user?.id,
       periodo: value.periodo?.trim() || undefined
     })
       .pipe(finalize(() => this.salvando = false))

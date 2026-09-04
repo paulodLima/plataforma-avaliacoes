@@ -6,6 +6,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
 @SpringBootTest
+@org.springframework.security.test.context.support.WithMockUser
 class BackendApplicationTests {
 
 	@Test
